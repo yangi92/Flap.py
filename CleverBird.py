@@ -4,6 +4,7 @@ import sys
 import pygame
 from pygame.locals import *
 from ScreenObject import *
+import pickle
 
 
 
@@ -34,7 +35,9 @@ _NUMBER_LIST =(
 			   'sprites/9.png'
 			  )
 _MENU ='sprites/menu.png'
-_FONT ='fonts/FlappyBirdy.ttf' 
+_FONT ='fonts/FlappyBird.ttf' 
+_ICON ='sprites/icon.png'
+_HIGHSCORE_PATH='output/score.p'
 
 try:
     xrange
@@ -42,6 +45,11 @@ except NameError:
     xrange = range
 
 def main():
+	"""Initializes the game 
+	   --------------------
+
+
+	"""
 
 	global FRAME, FPSCLOCK,OBJECTS
 	pygame.init()
@@ -50,6 +58,12 @@ def main():
 	pygame.display.set_caption('Flappy Bird')
 	OBJECTS = load_objects()
 	HITMASKS = create_hitmask()
+	icon = pygame.image.load(_ICON).convert_alpha()
+	pygame.display.set_icon(icon)
+
+
+	
+
 
 	while True:
 
@@ -61,6 +75,7 @@ def main():
 
 
 def menu_state():
+    
     FRAME.fill((0,0,0))
     while True:
     	mpos = pygame.mouse.get_pos()
@@ -148,6 +163,9 @@ def gameover_state(game_stats):
             if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
                     return
 
+       	if(game_stats['score'] > highscore.get_score()):
+       		highscore.update_score(game_stats['score'])
+
         update_screen(FRAME=FRAME,
         			  score=game_stats['score'],
         			  menu_state=False,
@@ -156,7 +174,7 @@ def gameover_state(game_stats):
         pygame.display.update()
 
 def load_objects():
-	global menu,numbers,pipe,bird,base,background,objects,gameovermsg,singlePlayer,learning
+	global menu,numbers,pipe,bird,base,background,objects,gameovermsg,singlePlayer,learning,highscore
 	objects = []
 	background= Background(path=_BACKGROUND,
 		                   pygame=pygame
@@ -195,6 +213,13 @@ def load_objects():
 						  center_x=FRAME.get_rect().centerx,
 						  center_y=_HEIGHT/1.8
 						  )
+
+	highscore = Highscore(path =_FONT,
+						  pygame=pygame,
+						  size=50,
+						  file_path =_HIGHSCORE_PATH,
+						  center_x=FRAME.get_rect().centerx,
+						  center_y=_HEIGHT/1.1)
 	
 	objects.append([background,bird,base,pipe])
 
@@ -207,6 +232,7 @@ def update_screen(FRAME,score,menu_state,gameOver_state):
 		menu.update(FRAME)
 		singlePlayer.update(FRAME)
 		learning.update(FRAME)
+		highscore.update(FRAME)
 	else:
 		[obj.update(FRAME) for obj in objects[0]]
 		"""displays score in center of screen"""

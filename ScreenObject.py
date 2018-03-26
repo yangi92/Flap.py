@@ -3,6 +3,7 @@ import random
 import sys
 import pygame
 from pygame.locals import *
+import pickle
 
 
 
@@ -56,8 +57,14 @@ class Pipe(ScreenObject):
 	def create_pipes(self):
 		newPipe1= self.random_pipe()
 		newPipe2= self.random_pipe()
-		self.upperPipes = [{'x': self._WIDTH + 200, 'y': newPipe1[0]['y']},{'x': self._WIDTH + 200 + (self._WIDTH / 2), 'y': newPipe2[0]['y']}]
-		self.lowerPipes = [{'x': self._WIDTH + 200, 'y': newPipe1[1]['y']},{'x': self._WIDTH + 200 + (self._WIDTH / 2), 'y': newPipe2[1]['y']}]
+		self.upperPipes = [{'x': self._WIDTH + 200,
+							'y': newPipe1[0]['y']},
+						   {'x': self._WIDTH + 200 + (self._WIDTH / 2),
+						    'y': newPipe2[0]['y']}]
+		self.lowerPipes = [{'x': self._WIDTH + 200,
+		                    'y': newPipe1[1]['y']},
+		                   {'x': self._WIDTH + 200 + (self._WIDTH / 2),
+		                    'y': newPipe2[1]['y']}]
     
 	def get_pipe_list(self):
 		return self.upperPipes,self.lowerPipes
@@ -84,12 +91,17 @@ class Pipe(ScreenObject):
 			Frame.blit(self.surface[1], (lPipe['x'], lPipe['y']))
 
 	def create_surface(self,pygame):
-		self.surface=(pygame.transform.rotate(pygame.image.load(self.path).convert_alpha(), 180),
-             pygame.image.load(self.path).convert_alpha())
+		self.surface=(pygame.transform.rotate(pygame.image.load(self.path).convert_alpha(),
+											  180
+											  ),
+             		 pygame.image.load(self.path).convert_alpha()
+             		 )
 
 
 	def random_pipe(self):
-		gap_Y = random.randrange(0, int(self._BASE_Y * 0.6 - self._PIPEGAPSIZE))
+		gap_Y = random.randrange(0,
+								 int(self._BASE_Y * 0.6 - self._PIPEGAPSIZE)
+								 )
 		gap_Y += int(self._BASE_Y * 0.2)
 		pipeHeight = self.get_surface()[0].get_height()
 		pipe_X = 288 + 10
@@ -118,7 +130,8 @@ class Bird(ScreenObject):
 		self.rotated_surface=self.get_surface()[0]		
 
     def update(self,Frame):
-    	Frame.blit(self.rotated_surface, (self.bird_x,self.bird_y))
+    	Frame.blit(self.rotated_surface,
+    		      (self.bird_x,self.bird_y))
 
     def get_x(self):
   		return self.bird_x
@@ -152,13 +165,14 @@ class Bird(ScreenObject):
             self.bird_Rot = 45
 
         self.bird_Height = self.get_surface()[0].get_height()
-        self.bird_y += min(self.bird_VelY, self._BASE_Y - self.bird_y - self.bird_Height)
+        self.bird_y += min(self.bird_VelY,
+        				   self._BASE_Y - self.bird_y - self.bird_Height)
 
         self.visibleRot = self.bird_RotThr
         if self.bird_Rot <= self.bird_RotThr:
         	self.visibleRot = self.bird_Rot
         self.rotated_surface=(pygame.transform.rotate(self.get_surface()[0], self.visibleRot))
-
+ 
 class Background(ScreenObject):
 	def __init__(self,path,pygame):
 		self.path=path
@@ -241,6 +255,43 @@ class Button(ScreenObject):
 
 	def unhighlight_text(self):
 		self.surface = self.font.render(self.text, True, (255,255,255))
+
+
+class Highscore(ScreenObject):
+	def __init__(self,pygame,path,size,file_path,center_x,center_y):
+		self.file_path=file_path
+		self.size=size
+		self.path=path
+		self.text="Highscore: "
+		self.score=self.retrieve_score().get('score')
+		
+		self.center_x=center_x
+		self.center_y=center_y
+		self.create_surface(pygame)
+
+	def retrieve_score(self):
+		return  pickle.load( open( self.file_path, "rb" ) )
+
+	def update_score(self,score):
+		self.score = score
+		pickle.dump( {'score':self.score}, open( self.file_path, "wb" ) )
+
+	def get_score(self):
+		return self.score
+
+	def create_surface(self,pygame):
+		self.font = pygame.font.Font(self.path,self.size)
+		print(self.score)
+		self.surface = self.font.render(self.text+str(self.score), True, (255,255,255))
+		self.spRect = self.surface.get_rect()
+		self.spRect.centerx = self.center_x
+		self.spRect.centery = self.center_y
+	def update(self,Frame):
+		Frame.blit(self.get_surface(), self.spRect)
+
+ 
+
+
 
 
 
