@@ -10,19 +10,19 @@ import pickle
 class ScreenObject:
 
 
-	def __init__(self,path,pygame):
+	def __init__(self,path,pos_x,pos_y):
 		self.path=path
-		self.create_surface(pygame)
+		self.create_surface()
 		self.pos_x
 		self.pos_y
 
 	def get_path(self):
 		return self.path
 
-	def create_surface(self,pygame):
+	def create_surface(self):
 		self.surface=pygame.image.load(self.path).convert_alpha()
 
-	def create_msurface(self,pygame):
+	def create_msurface(self):
 		self.surface=[pygame.image.load(path).convert_alpha() for path in self.path]
 
 	def get_surface(self):
@@ -31,7 +31,7 @@ class ScreenObject:
 	def update(self,Frame):
 		Frame.blit(self.surface, (pos_x,pos_y))
 
-	def update_movement(self,pygame):
+	def update_movement(self):
 		pass
 
 	def getHitmask(self,image):
@@ -44,9 +44,9 @@ class ScreenObject:
 
 class Pipe(ScreenObject):
 
-	def __init__(self,path,pygame):
+	def __init__(self,path):
 		self.path=path
-		self.create_surface(pygame)
+		self.create_surface()
 		self.pipeVelX = -4
 		self._BASE_Y = 512*0.79
 		self._PIPEGAPSIZE = 100
@@ -72,7 +72,7 @@ class Pipe(ScreenObject):
 	def get_x(self,pipe):
 		return pipe['x']
     	
-	def update_movement(self,pygame):
+	def update_movement(self):
 		for uPipe, lPipe in zip(self.upperPipes, self.lowerPipes):
 			uPipe['x'] += self.pipeVelX
 			lPipe['x'] += self.pipeVelX
@@ -90,7 +90,7 @@ class Pipe(ScreenObject):
 			Frame.blit(self.surface[0], (uPipe['x'], uPipe['y']))
 			Frame.blit(self.surface[1], (lPipe['x'], lPipe['y']))
 
-	def create_surface(self,pygame):
+	def create_surface(self):
 		self.surface=(pygame.transform.rotate(pygame.image.load(self.path).convert_alpha(),
 											  180
 											  ),
@@ -112,9 +112,9 @@ class Pipe(ScreenObject):
 
 
 class Bird(ScreenObject):
-    def __init__(self,path,pygame):
+    def __init__(self,path):
 		self.path=path
-		self.create_msurface(pygame)
+		self.create_msurface()
 		self.bird_x=int(288 * 0.2)
 		self.bird_y= int((512 - self.get_surface()[0].get_height()) / 2)
 		self.bird_VelY    =  -10   # bird_'s velocity along Y, default same as bird_Flapped
@@ -151,7 +151,7 @@ class Bird(ScreenObject):
                     self.bird_Flapped = True
 
 
-    def update_movement(self,pygame):
+    def update_movement(self):
 		 # rotate the bird_
         if self.bird_Rot > -90:
             self.bird_Rot -= self.bird_VelRot
@@ -174,9 +174,9 @@ class Bird(ScreenObject):
         self.rotated_surface=(pygame.transform.rotate(self.get_surface()[0], self.visibleRot))
  
 class Background(ScreenObject):
-	def __init__(self,path,pygame):
+	def __init__(self,path):
 		self.path=path
-		self.create_surface(pygame)
+		self.create_surface()
 		self.bg_x=0
 		self.bg_y=0
 
@@ -185,9 +185,9 @@ class Background(ScreenObject):
 		Frame.blit(self.get_surface(), (self.bg_x,self.bg_y))
 
 class Base(ScreenObject):
-	def __init__(self,path,pygame,background_width):
+	def __init__(self,path,background_width):
 		self.path=path
-		self.create_surface(pygame)
+		self.create_surface()
 		self.base_x =0
 		self.base_y =512*0.79
 
@@ -201,27 +201,27 @@ class Base(ScreenObject):
 		Frame.blit(self.get_surface(), (self.base_x,self.base_y))
 
 
-	def update_movement(self,pygame):
+	def update_movement(self):
 		self.base_x = -((-self.base_x + 100) % self.base_shift)
 
 class Number(ScreenObject):
-	def __init__(self,path,pygame):
+	def __init__(self,path):
 		self.path=path
-		self.create_msurface(pygame)
+		self.create_msurface()
 
 
 class GameOverMessage(ScreenObject):
-	def __init__(self,path,pygame):
+	def __init__(self,path):
 		self.path=path
-		self.create_surface(pygame)
+		self.create_surface()
 
 	def update(self,Frame):
 		Frame.blit(self.get_surface(), (50,100))
 
 class Menu(ScreenObject):
-	def __init__(self,path,pygame):
+	def __init__(self,path):
 		self.path=path
-		self.create_surface(pygame)
+		self.create_surface()
 
 
 	def update(self,Frame):
@@ -229,18 +229,18 @@ class Menu(ScreenObject):
 
 class Button(ScreenObject):
 
-	def __init__(self,pygame,path,text,size,center_x,center_y):
+	def __init__(self,path,text,size,center_x,center_y):
 		self.path=path
 		self.text=text
 		self.size=size
 		self.center_x=center_x
 		self.center_y=center_y
-		self.create_surface(pygame)
+		self.create_surface()
 
 	def get_rect(self):
 		return self.spRect
 
-	def create_surface(self,pygame):
+	def create_surface(self):
 		self.font = pygame.font.Font(self.path,self.size)
 		self.surface = self.font.render(self.text, True, (255,255,255))
 		self.spRect = self.surface.get_rect()
@@ -258,7 +258,7 @@ class Button(ScreenObject):
 
 
 class Highscore(ScreenObject):
-	def __init__(self,pygame,path,size,file_path,center_x,center_y):
+	def __init__(self,path,size,file_path,center_x,center_y):
 		self.file_path=file_path
 		self.size=size
 		self.path=path
@@ -267,7 +267,7 @@ class Highscore(ScreenObject):
 		
 		self.center_x=center_x
 		self.center_y=center_y
-		self.create_surface(pygame)
+		self.create_surface()
 
 	def retrieve_score(self):
 		return  pickle.load( open( self.file_path, "rb" ) )
@@ -279,13 +279,13 @@ class Highscore(ScreenObject):
 	def get_score(self):
 		return self.score
 
-	def create_surface(self,pygame):
+	def create_surface(self):
 		self.font = pygame.font.Font(self.path,self.size)
-		print(self.score)
 		self.surface = self.font.render(self.text+str(self.score), True, (255,255,255))
 		self.spRect = self.surface.get_rect()
 		self.spRect.centerx = self.center_x
 		self.spRect.centery = self.center_y
+
 	def update(self,Frame):
 		Frame.blit(self.get_surface(), self.spRect)
 

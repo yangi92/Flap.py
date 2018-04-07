@@ -1,5 +1,5 @@
 (dp0
 S'score'
 p1
-I15
+I79
 s.
