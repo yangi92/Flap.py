@@ -1,7 +1,7 @@
 # Flap.py
 
-A Flappy Bird Python implementation using Pygame.
-
+A Flappy Bird Python implementation using Pygame. <br>
+![Alt text](https://github.com/yangi92/Flap.py/blob/master/sprites/Screenshot.png "Screenshot")
 ## Getting Started
 
 Two main modes:
