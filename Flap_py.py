@@ -228,7 +228,7 @@ class Flap_py():
 								  )
 
 			self.learning_button = Button(path=_FONT,
-								  text="learning_button",
+								  text="Learning",
 								  size=50,
 								  center_x=self.frame.get_rect().centerx,
 								  center_y=_HEIGHT/1.8
